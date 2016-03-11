@@ -31,6 +31,9 @@ which)
 open)
     open .
     ;;
+readme)
+    open ../readme.md
+    ;;
 *)
     vagrant $PARAMETERS
     ;;
