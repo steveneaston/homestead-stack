@@ -32,3 +32,34 @@ function serve-hhvm() {
         echo "  serve-hhvm domain path"
     fi
 }
+
+function dbbackup() {
+    if [[ "$1" ]]
+    then
+        BACKUP_DIR="$1"
+        MYSQL_USER="homestead"
+        MYSQL_PASSWORD="secret"
+
+        TIMESTAMP=$(date +"%F")
+        MYSQL=/usr/bin/mysql
+        MYSQLDUMP=/usr/bin/mysqldump
+
+        mkdir -p "$BACKUP_DIR/$TIMESTAMP"
+
+        databases=`$MYSQL --user=$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema)"`
+
+        for db in $databases; do
+          if [[ $db != "performance_schema" ]]
+          then
+            echo "Backing up: $db"
+            $MYSQLDUMP --force --opt --user=$MYSQL_USER -p$MYSQL_PASSWORD --databases $db | gzip > "$BACKUP_DIR/$TIMESTAMP/$db.gz"
+          fi
+        done
+
+        echo "Completed backup"
+    else
+        echo "Error: missing required parameters."
+        echo "Usage: "
+        echo "  dbbackup path"
+    fi
+}
