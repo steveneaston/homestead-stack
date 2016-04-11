@@ -74,7 +74,12 @@ tar xf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 sudo mv ./wkhtmltox/bin/* /usr/local/bin/
 ```
 
-### Install Mongo
+### Install php-intl extension
+```
+sudo apt-get update && sudo apt-get install php7.0-intl
+```
+
+### Install Mongo (Optional)
 ```
 # sudo apt-get install libsasl2-dev
 # Follow instructions from: https://github.com/mongodb/mongo-php-driver/tree/PHP7
