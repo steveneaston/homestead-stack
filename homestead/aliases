@@ -52,7 +52,7 @@ function dbbackup() {
           if [[ $db != "performance_schema" ]]
           then
             echo "Backing up: $db"
-            $MYSQLDUMP --force --opt --user=$MYSQL_USER -p$MYSQL_PASSWORD --databases $db | gzip > "$BACKUP_DIR/$TIMESTAMP/$db.gz"
+            $MYSQLDUMP --force --opt --user=$MYSQL_USER -p$MYSQL_PASSWORD --default-character-set=utf8 --single-transaction --skip-set-charset --databases $db | gzip > "$BACKUP_DIR/$TIMESTAMP/$db.gz"
           fi
         done
 
