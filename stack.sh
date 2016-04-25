@@ -19,6 +19,13 @@ case $1 in
 install)
     composer install
     ;;
+self-update)
+    cd ../
+    git pull
+    ;;
+selfupdate)
+    stack self-update
+    ;;
 edit)
     open ./Homestead.yaml
     ;;
