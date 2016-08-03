@@ -35,6 +35,9 @@ modify)
 which)
     echo $STACKDIR
     ;;
+project)
+    subl $STACKDIR
+    ;;
 open)
     open .
     ;;
