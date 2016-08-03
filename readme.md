@@ -72,6 +72,7 @@ echo "RUN=yes" | sudo tee /etc/default/cachefilesd
 curl -O http://download.gna.org/wkhtmltopdf/0.12/0.12.3/wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 tar xf wkhtmltox-0.12.3_linux-generic-amd64.tar.xz
 sudo mv ./wkhtmltox/bin/* /usr/local/bin/
+sudo apt-get install -y libxrender1 libfontconfig1
 ```
 
 ### Install php-intl extension
