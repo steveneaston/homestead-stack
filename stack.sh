@@ -22,6 +22,7 @@ install)
 self-update)
     cd ../
     git pull
+    composer install
     ;;
 selfupdate)
     stack self-update
@@ -31,6 +32,9 @@ edit)
     ;;
 modify)
     subl .
+    ;;
+self)
+    subl ../
     ;;
 which)
     echo $STACKDIR

@@ -1,3 +1,6 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
 require 'json'
 require 'yaml'
 
@@ -11,36 +14,35 @@ aliasesPath = "aliases"
 
 require File.expand_path(confDir + '/scripts/homestead.rb')
 
+Vagrant.require_version '>= 1.9.0'
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    if File.exists? aliasesPath then
-        config.vm.provision "file", source: aliasesPath, destination: "~/.bash_aliases"
+    if File.exist? aliasesPath then
+        config.vm.provision "file", source: aliasesPath, destination: "/tmp/bash_aliases"
+        config.vm.provision "shell" do |s|
+            s.inline = "awk '{ sub(\"\r$\", \"\"); print }' /tmp/bash_aliases > /home/vagrant/.bash_aliases"
+        end
     end
 
-    if File.exists? homesteadYamlPath then
+    if File.exist? homesteadYamlPath then
         settings = YAML::load(File.read(homesteadYamlPath))
-        Homestead.configure(config, settings)
-    elsif File.exists? homesteadJsonPath then
-        settings = JSON.parse(File.read(homesteadJsonPath))
-        Homestead.configure(config, settings)
+    elsif File.exist? homesteadJsonPath then
+        settings = JSON::parse(File.read(homesteadJsonPath))
+    else
+        abort "Homestead settings file not found in #{confDir}"
     end
 
-    if File.exists? afterScriptPath then
-        config.vm.provision "shell", path: afterScriptPath
+    Homestead.configure(config, settings)
+
+    if File.exist? afterScriptPath then
+        config.vm.provision "shell", path: afterScriptPath, privileged: false, keep_color: true
     end
 
-    # Site settings
-    settings["sites"].each do |site|
-        rootPath = site["to"].sub(/public$/, '');
-
-        # Migrate database
-        if (site.has_key?("migrate") && site["migrate"])
-            config.vm.provision "shell",
-                inline: "php " + rootPath + "artisan migrate"
-        end
-
-        # Run queue worker
-        if (site.has_key?("queue") && site["queue"])
-            config.vm.provision "shell", path: "scripts/queue-worker.sh", args: [rootPath, site["map"]]
-        end
+    if Vagrant.has_plugin?('vagrant-hostsupdater')
+        config.hostsupdater.aliases = settings['sites'].map { |site| site['map'] }
+    elsif Vagrant.has_plugin?('vagrant-hostmanager')
+        config.hostmanager.enabled = true
+        config.hostmanager.manage_host = true
+        config.hostmanager.aliases = settings['sites'].map { |site| site['map'] }
     end
 end
